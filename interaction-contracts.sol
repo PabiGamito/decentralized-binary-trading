@@ -12,6 +12,11 @@ contract Call {
 
   // This function is called when ever someone sends ethers to this contract's address
   function () payable {
+    // TODO: Update with actual gas cost, tx.gasprice?
+    if(msg.value < (ETHUSD * 10 + 0.05 ) * 1 ether) throw; // reverts the transfer to user if desposit is enough to cover oraclize's costs and contract execution
+    // Get the exchange rate at time of transaction
+    // TODO: Figure out how to get exact time of transaction
+    
     // attempts to redirect all funds to the main contract
     if (!addressOfM.send(msg.value)) throw;
   }
