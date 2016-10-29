@@ -38,8 +38,9 @@ contract BinaryTrading is usingOraclize {
   }
 
   mapping (uint => Bet) bets;
-  uint NewBetId;
+  uint newBetId;
   mapping (bytes32 => uint) betIdWithQueryId;
+  mapping (bytes32 => uint) delayWithQueryId;
 
   // This function is called upon contract creation
   function BinaryTrading() {
@@ -78,10 +79,12 @@ contract BinaryTrading is usingOraclize {
 
   function internalCallRequest(address userAddress, uint betValue, uint delay) private {
     // TODO: Makes sure delay is short enough otherwise there is too much of a big advantage given to the user
-    NewBetId += 1;
-    bets[NewBetId] = Bet(userAddress, betValue, false, 0) // (address userAddress, uint value, bool putOption // true = put : false = call, uint openPositionPrice)
+    newBetId += 1;
+    bets[newBetId] = Bet(userAddress, betValue, false, 0) // (address userAddress, uint value, bool putOption // true = put : false = call, uint openPositionPrice)
     // TODO: make oraclize query with selected delay
-    betIdWithQueryId[??] = NewBetId;
+    bytes32 myid = oraclize_query(0, "URL", "json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD");
+    betIdWithQueryId[myid] = newBetId;
+    delayWithQueryId[myid] = delay;
   }
 
   // This can only be called from someone outside this contract
@@ -101,16 +104,9 @@ contract BinaryTrading is usingOraclize {
 
  /*TODO:*/
 
-   // **************** //
-  // UPDATE FUNCTIONS //
- // **************** //
-
-
- function updateExchangeRateForCallRequest(uint delay, mapping bet) {
-   // Costs $0.01 for URL call + $0.04 for TLSNotary = $0.05 per update
-   oraclize_query(delay, "URL",
-     "json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD");
- }
+   // ****************** //
+  // CALLBACK FUNCTIONS //
+ // ****************** //
 
  // This function is called when the get request results are ready
  function __callback(bytes32 myid, string result, bytes proof) {
@@ -122,7 +118,9 @@ contract BinaryTrading is usingOraclize {
 
    // check openPositionPrice has been set or not and act upon that
    if (bets[betIdWithQueryId[myid]].openPositionPrice == 0) {
-     bets[betIdWithQueryId[myid]].openPositionPrice == ETHUSD;
+     bets[betIdWithQueryId[myid]].openPositionPrice = ETHUSD;
+     bytes32 newMyid = oraclize_query(delayWithQueryId[myid], "URL", "json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD");
+     betIdWithQueryId[newMyid] = betIdWithQueryId[myid];
    } else {
      closePosition(betIdWithQueryId[myid])
    }
