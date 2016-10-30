@@ -11,6 +11,11 @@ external - Cannot be accessed internally, only externally.*/
 /*TODO: Make sure user can't bet more than what he has in his balance - what is in trade because right now he can*/
 
 contract BinaryTrading is usingOraclize {
+
+  // ********* //
+  // VARIABLES //
+  // ********* //
+
   // Used to store the contract creator's address
   address minter;
 
@@ -20,15 +25,9 @@ contract BinaryTrading is usingOraclize {
   // Exchange Price Variable in cents
   uint public ETHUSD;
 
-  // Struct to store users
-  /*struct User {
-    address despoitAddress;
-    uint balance;
-  }*/
-
   // Maps so that user balances are easily accessible by address
   mapping (address => balance) userBalance;
-  /*mapping (address => User) users;*/
+  uint brokerBalance;
 
   struct Bet private {
     address userAddress;
@@ -41,6 +40,10 @@ contract BinaryTrading is usingOraclize {
   uint newBetId;
   mapping (bytes32 => uint) betIdWithQueryId;
   mapping (bytes32 => uint) delayWithQueryId;
+
+  // ************** //
+  // MAIN FUNCTIONS //
+  // ************** //
 
   // This function is called upon contract creation
   function BinaryTrading() {
@@ -59,26 +62,42 @@ contract BinaryTrading is usingOraclize {
   }
 
   // This function allows the user to withdraw his funds
-  function withdraw() returns (uint withdrawalBalance) external {
-    withdrawalBalance = users[msg.address].balance;
-    if (!msg.address.send(withdrawalBalance)) throw;
+  function withdraw() external returns (uint withdrawalBalance) {
+    withdrawalBalance = users[msg.sender].balance;
+    if (!msg.sender.send(withdrawalBalance)) throw;
   }
 
-  /*modifier onlyMinter() {
+  function brokerWithdrawl(uint amountInEther) external {
     if (msg.sender != minter) throw;
-    _;
-  }*/
+    if (amountInEther * 1 ether > brokerBalance) throw;
+    if (!minter.send(amountInEther * 1 ether)) throw;
+  }
 
-  function deposit() payable external returns (uint balance) external {
+  function brokerDeposit() payable external returns (uint balance) {
+    brokerBalance += msg.value;
     return this.balance;
   }
 
-    // *********************** //
-   // CALL POSITION FUNCTIONS //
+  // User deposit
+  function deposit() payable external returns (uint balance) {
+    userBalance[msg.sender] += balance;
+    returns userBalance[msg.sender];
+  }
+
+  // *********************** //
+  // CALL POSITION FUNCTIONS //
   // *********************** //
 
-  function internalCallRequest(address userAddress, uint betValue, uint delay) private {
-    // TODO: Makes sure delay is short enough otherwise there is too much of a big advantage given to the user
+  // This can only be called from someone outside this contract as it requires a deposit
+  function externalCallRequest(uint secondsToExpiration) payable external {
+    // TODO: Check if you can deposit money through this function and the get a throw in placeCallOption and get refunded with increased balance.
+    userBalance[msg.sender] += msg.value;
+    placeCallOption(msg.sender, msg.value, secondsToExpiration);
+  }
+
+  function placeCallOption(address userAddress, uint betValue, uint delay) private {
+    // Max delay is 30 minutes
+    if (delay > 30*60) throw;
     newBetId += 1;
     bets[newBetId] = Bet(userAddress, betValue, false, 0) // (address userAddress, uint value, bool putOption // true = put : false = call, uint openPositionPrice)
     // TODO: make oraclize query with selected delay
@@ -87,26 +106,31 @@ contract BinaryTrading is usingOraclize {
     delayWithQueryId[myid] = delay;
   }
 
-  // This can only be called from someone outside this contract
-  function call() payable external {
-    // Registers new user with its balance if necessary
-    // TODO: make sure !userBalance[msg.sender] does what we want it to do
-    if (!userBalance[msg.sender]) {
-      userBalance[msg.sender] = msg.value;
-    } else {
-      userBalance[msg.sender] += msg.value;
-    }
+  // ********************** //
+  // PUT POSITION FUNCTIONS //
+  // ********************** //
+
+  // This can only be called from someone outside this contract as it requires a deposit
+  function externalPutRequest(uint secondsToExpiration) payable external {
+    // TODO: Check if you can deposit money through this function and the get a throw in placeCallOption and get refunded with increased balance.
+    userBalance[msg.sender] += msg.value;
+    placePutOption(msg.sender, msg.value, secondsToExpiration);
   }
 
-   // ********************** //
-  // PUT POSITION FUNCTIONS //
- // ********************** //
+  function placePutOption(address userAddress, uint betValue, uint delay) private {
+    // Max delay is 30 minutes
+    if (delay > 30*60) throw;
+    newBetId += 1;
+    bets[newBetId] = Bet(userAddress, betValue, true, 0) // (address userAddress, uint value, bool putOption // true = put : false = call, uint openPositionPrice)
+    // TODO: make oraclize query with selected delay
+    bytes32 myid = oraclize_query(0, "URL", "json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD");
+    betIdWithQueryId[myid] = newBetId;
+    delayWithQueryId[myid] = delay;
+  }
 
- /*TODO:*/
-
-   // ****************** //
+  // ****************** //
   // CALLBACK FUNCTIONS //
- // ****************** //
+  // ****************** //
 
  // This function is called when the get request results are ready
  function __callback(bytes32 myid, string result, bytes proof) {
@@ -159,6 +183,4 @@ contract BinaryTrading is usingOraclize {
    }
  }
 
-
-
-}
+} /* Contract End */
