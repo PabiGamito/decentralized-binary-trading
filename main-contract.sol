@@ -6,7 +6,8 @@ import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
 /*public - all
 private - only this contract
 internal - only this contract and contracts deriving from it
-external - Cannot be accessed internally, only externally.*/
+external - Cannot be accessed internally, only externally.
+TODO: Pay some of the extra brokerBalance as interest to users who have money inside the contract to incite them to deposit and then trade*/
 
 /*TODO: Make sure user can't bet more than what he has in his balance - what is in trade because right now he can*/
 
@@ -28,6 +29,7 @@ contract BinaryTrading is usingOraclize {
   // Maps so that user balances are easily accessible by address
   mapping (address => balance) userBalance;
   uint brokerBalance;
+  uint public returnRate;
 
   struct Bet private {
     address userAddress;
@@ -37,28 +39,40 @@ contract BinaryTrading is usingOraclize {
   }
 
   mapping (uint => Bet) bets;
-  uint newBetId;
+  uint latestBetId;
   mapping (bytes32 => uint) betIdWithQueryId;
   mapping (bytes32 => uint) delayWithQueryId;
+  uint constant maxBet = brokerBalance/returnRate;
+  uint valueInBets; // TODO: Make the changes to this value were needed in code
 
   // ************** //
   // MAIN FUNCTIONS //
   // ************** //
 
   // This function is called upon contract creation
-  function BinaryTrading() {
+  function BinaryTrading(uint _returnRate) {
     minter = msg.sender;
+    returnRate = returnRate;
     oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
   }
 
   // This function is the fallback function
-  function () payable {
+  function () {
     throw;
   }
 
-  // This function can be called by a user to reinvest his funds into a selected contract without withdrawing
-  function reinvest() external {
-    // TODO: Make is call the function that is needed to execute a certain bet
+  modifier onlyMinter {
+    if (msg.sender != minter) throw;
+    _;
+  }
+
+  function updateReturnRate(uint newReturnRate) onlyMinter {
+    returnRate = newReturnRate;
+  }
+
+  function brokerWithdrawl(uint amountInEther) external onlyMinter {
+    if (amountInEther * 1 ether > brokerBalance) throw;
+    if (!minter.send(amountInEther * 1 ether)) throw;
   }
 
   // This function allows the user to withdraw his funds
@@ -67,13 +81,8 @@ contract BinaryTrading is usingOraclize {
     if (!msg.sender.send(withdrawalBalance)) throw;
   }
 
-  function brokerWithdrawl(uint amountInEther) external {
-    if (msg.sender != minter) throw;
-    if (amountInEther * 1 ether > brokerBalance) throw;
-    if (!minter.send(amountInEther * 1 ether)) throw;
-  }
-
   function brokerDeposit() payable external returns (uint balance) {
+    // TODO: Make it so this can be an investment in contract/company and pays back interests
     brokerBalance += msg.value;
     return this.balance;
   }
@@ -98,11 +107,11 @@ contract BinaryTrading is usingOraclize {
   function placeCallOption(address userAddress, uint betValue, uint delay) private {
     // Max delay is 30 minutes
     if (delay > 30*60) throw;
-    newBetId += 1;
-    bets[newBetId] = Bet(userAddress, betValue, false, 0) // (address userAddress, uint value, bool putOption // true = put : false = call, uint openPositionPrice)
+    latestBetId += 1;
+    bets[latestBetId] = Bet(userAddress, betValue, false, 0) // (address userAddress, uint value, bool putOption // true = put : false = call, uint openPositionPrice)
     // TODO: make oraclize query with selected delay
     bytes32 myid = oraclize_query(0, "URL", "json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD");
-    betIdWithQueryId[myid] = newBetId;
+    betIdWithQueryId[myid] = latestBetId;
     delayWithQueryId[myid] = delay;
   }
 
@@ -120,11 +129,11 @@ contract BinaryTrading is usingOraclize {
   function placePutOption(address userAddress, uint betValue, uint delay) private {
     // Max delay is 30 minutes
     if (delay > 30*60) throw;
-    newBetId += 1;
-    bets[newBetId] = Bet(userAddress, betValue, true, 0) // (address userAddress, uint value, bool putOption // true = put : false = call, uint openPositionPrice)
+    latestBetId += 1;
+    bets[latestBetId] = Bet(userAddress, betValue, true, 0) // (address userAddress, uint value, bool putOption // true = put : false = call, uint openPositionPrice)
     // TODO: make oraclize query with selected delay
     bytes32 myid = oraclize_query(0, "URL", "json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD");
-    betIdWithQueryId[myid] = newBetId;
+    betIdWithQueryId[myid] = latestBetId;
     delayWithQueryId[myid] = delay;
   }
 
@@ -156,29 +165,31 @@ contract BinaryTrading is usingOraclize {
    if (bets[betId].putOption) {
      // bet was a put option: bet the value was going to go UP
      if (bets[betId].openPositionPrice < ETHUSD) {
-       // Value went UP: wins bet
-       // TODO: Decide fair win %
-       userBalance[bets[betId].userAddress] += bet.value * (70/100) // reward +70% to the user
+       // Value went UP: WINS bet
+       brokerBalance -= bet.value * ReturnRate;
+       userBalance[bets[betId].userAddress] += bet.value * ReturnRate;
      } else if (bets[betId].openPositionPrice > ETHUSD) {
-       // Value went DOWN: loses bet
-       userBalance[bets[betId].userAddress] -= bet.value
+       // Value went DOWN: LOSES bet
+       brokerBalance += bet.value;
+       userBalance[bets[betId].userAddress] -= bet.value;
      } else {
        // Just take fee of executing transations
        // TODO: Decide whether or not this is truely necessary
-       userBalance[bets[betId].userAddress] -= 0.10 * ETHUSD
+       userBalance[bets[betId].userAddress] -= 0.10 * ETHUSD;
      }
    } else {
      // bet was a call option: bet the value was going to go DOWN
      if (bets[betId].openPositionPrice > ETHUSD) {
-       // Value went DOWN: wins bet
-       // TODO: Decide fair win %
-       userBalance[bets[betId].userAddress] += bet.value * (70/100) // reward +70% to the user
+       // Value went DOWN: WINS bet
+       brokerBalance -= bet.value * ReturnRate;
+       userBalance[bets[betId].userAddress] += bet.value * returnRate;
      } else if (bets[betId].openPositionPrice < ETHUSD) {
-       // Value went UP: loses bet
-       userBalance[bets[betId].userAddress] -= bet.value
+       // Value went UP: LOSES bet
+       brokerBalance += bet.value;
+       userBalance[bets[betId].userAddress] -= bet.value;
      } else {
        // Just take fee of executing transations
-       userBalance[bets[betId].userAddress] -= 0.10 * ETHUSD
+       userBalance[bets[betId].userAddress] -= 0.10 * ETHUSD;
      }
    }
  }
