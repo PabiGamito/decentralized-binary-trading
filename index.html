@@ -4,16 +4,23 @@
     <meta charset="utf-8">
     <title></title>
     <link rel="stylesheet" href="assets/chartist.min.css" media="screen" title="no title">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   </head>
   <body>
 
     <!-- TODO: Use threshold plugin http://gionkunz.github.io/chartist-js/plugins.html#zoom-plugin -->
 
-    <div class="ct-chart ct-perfect-fourth" style="max-width:100vw; max-height:100vh;"></div>
+    <canvas id="sparkline" width="100%" height="100%" data-sparkline="1,2,3,4,5,5.5,5.8,6,5.4,4.8,3,2,2,6,7,8,9,10,10,7,6,7,7,8,9">
+Your browser does not support the HTML5 canvas tag.</canvas>
 
-    <script src="assets/chartist.min.js"></script>
+    <script src="https://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.js"></script>
+    <script type="text/javascript" src="assets/sparkline.js"></script>
 
-    <script type="text/javascript">
+    <!-- <div class="ct-chart ct-perfect-fourth" style="max-width:100vw; max-height:100vh;"></div> -->
+
+    <!-- <script src="assets/chartist.min.js"></script> -->
+
+    <!-- <script type="text/javascript">
       var chart = new Chartist.Line('.ct-chart', {
       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
       series: [
@@ -39,6 +46,6 @@
         });
       }
       });
-    </script>
+    </script> -->
   </body>
 </html>

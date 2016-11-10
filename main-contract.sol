@@ -10,6 +10,9 @@ external - Cannot be accessed internally, only externally.
 TODO: Pay some of the extra brokerBalance as interest to users who have money inside the contract to incite them to deposit and then trade*/
 
 /*TODO: Make sure user can't bet more than what he has in his balance - what is in trade because right now he can*/
+/*TODO: Figure out a way to have varying returnRate based on total succesful bets*/
+/*TODO: Figure out a way for extra money to come in so it isn't a 0 sum game*/
+/*TODO: Figure out how to deal with contract only being executed every 10-15 seconds*/
 
 contract BinaryTrading is usingOraclize {
 
