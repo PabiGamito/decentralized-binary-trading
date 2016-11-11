@@ -21,6 +21,8 @@
 
     <div><span id="live-price"></span> mBTC</div>
 
+    <!-- TODO: Make a background like this one: http://faucet.etherparty.io/ -->
+
     <canvas id="sparkline" width="100%" height="100%" data-sparkline="1,2,3,4,5,5.5,5.8,6,5.4,4.8,3,2,2,6,7,8,9,10,10,7,6,7,7,8,9">
       Your browser does not support the HTML5 canvas tag. Please upgrade your browser. We reccomend you install <a href="https://www.google.com/chrome/browser/desktop/">Google Chrome</a>
     </canvas>
@@ -95,6 +97,12 @@
           }
         });
       }
+
+      var binarytradingContract = web3.eth.contract([{"constant":false,"inputs":[{"name":"amountInEther","type":"uint256"}],"name":"brokerWithdrawl","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"},{"name":"proof","type":"bytes"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[{"name":"withdrawalBalance","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"secondsToExpiration","type":"uint256"}],"name":"externalPutRequest","outputs":[],"payable":true,"type":"function"},{"constant":true,"inputs":[],"name":"ETHUSD","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"returnRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"brokerDeposit","outputs":[{"name":"balance","type":"uint256"}],"payable":true,"type":"function"},{"constant":false,"inputs":[],"name":"deposit","outputs":[],"payable":true,"type":"function"},{"constant":false,"inputs":[{"name":"newReturnRate","type":"uint256"}],"name":"updateReturnRate","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"secondsToExpiration","type":"uint256"}],"name":"externalCallRequest","outputs":[],"payable":true,"type":"function"},{"inputs":[{"name":"_returnRate","type":"uint256"}],"type":"constructor"},{"payable":false,"type":"fallback"}]).at("0x5caD3cBdbf64B65174b36269f5201d3265569F2B");
+
+      var returnRate = binarytradingContract.returnRate.call(function(error, result){
+        console.log(result);
+      });
 
     });
     </script>
