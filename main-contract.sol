@@ -45,7 +45,7 @@ contract BinaryTrading is usingOraclize {
   uint latestBetId;
   mapping (bytes32 => uint) betIdWithQueryId;
   mapping (bytes32 => uint) delayWithQueryId;
-  uint constant maxBet = brokerBalance/returnRate;
+  uint constant maxBet = brokerBalance/(returnRate/100);
   uint valueInBets; // TODO: Make the changes to this value were needed in code
 
   // ************** //
@@ -169,8 +169,8 @@ contract BinaryTrading is usingOraclize {
      // bet was a put option: bet the value was going to go UP
      if (bets[betId].openPositionPrice < ETHUSD) {
        // Value went UP: WINS bet
-       brokerBalance -= bets[betId].value * returnRate;
-       userBalance[bets[betId].userAddress] += bets[betId].value * returnRate;
+       brokerBalance -= bets[betId].value * (returnRate/100);
+       userBalance[bets[betId].userAddress] += bets[betId].value * (returnRate/100);
      } else if (bets[betId].openPositionPrice > ETHUSD) {
        // Value went DOWN: LOSES bet
        brokerBalance += bets[betId].value;
@@ -184,8 +184,8 @@ contract BinaryTrading is usingOraclize {
      // bet was a call option: bet the value was going to go DOWN
      if (bets[betId].openPositionPrice > ETHUSD) {
        // Value went DOWN: WINS bet
-       brokerBalance -= bets[betId].value * returnRate;
-       userBalance[bets[betId].userAddress] += bets[betId].value * returnRate;
+       brokerBalance -= bets[betId].value * (returnRate/100);
+       userBalance[bets[betId].userAddress] += bets[betId].value * (returnRate/100);
      } else if (bets[betId].openPositionPrice < ETHUSD) {
        // Value went UP: LOSES bet
        brokerBalance += bets[betId].value;
