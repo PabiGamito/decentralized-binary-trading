@@ -83,14 +83,15 @@
         $("#user-balance").text(balance);
       }
 
+      var network = null;
       function connectedNetwork() {
         web3.eth.getBlock(0, function (error, result) {
           if (result.hash === "0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3") {
-            console.log("Connected to Mainnet");
+            network = "mainnet";
           } else if (result.hash === "0x0cd786a2425d16f152c658316c423e6ce1181e15c3295826d7c9904cba9ce303") {
-            console.log("Connected to Testnet");
+            network = "testnet";
           } else {
-            console.log("Connected to a Private Network");
+            network = "private";
           }
         });
       }
