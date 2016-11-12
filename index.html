@@ -3,8 +3,11 @@
   <head>
     <meta charset="utf-8">
     <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,700" rel="stylesheet">
     <link rel="stylesheet" href="assets/main.css" media="screen" title="no title">
     <!-- <link rel="stylesheet" href="assets/chartist.min.css" media="screen" title="no title"> -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   </head>
   <body>
@@ -14,32 +17,56 @@
           <li><span id="user-balance"></span> ETH</li>
         </ul>
       </div>
-      <div class="nav-bottom">
-        <span>.nav-bottom</span>
-      </div>
+      <div class="nav-bottom"></div>
     </nav>
 
-    <div><span id="live-price"></span> mBTC</div>
+    <div class="app-container">
+      <!-- TODO: Make a background like this one: http://faucet.etherparty.io/ -->
+      <div class="row">
+        <div class="col-md-9">
 
-    <!-- TODO: Make a background like this one: http://faucet.etherparty.io/ -->
+          <div class="price"><span id="live-price"></span> mBTC</div>
 
-    <canvas id="sparkline" width="100%" height="100%" data-sparkline="1,2,3,4,5,5.5,5.8,6,5.4,4.8,3,2,2,6,7,8,9,10,10,7,6,7,7,8,9">
-      Your browser does not support the HTML5 canvas tag. Please upgrade your browser. We reccomend you install <a href="https://www.google.com/chrome/browser/desktop/">Google Chrome</a>
-    </canvas>
+          <div class="card chart">
+            <canvas id="sparkline" width="100%" height="100%" data-sparkline="1,2,3,4,5,5.5,5.8,6,5.4,4.8,3,2,2,6,7,8,9,10,10,7,6,7,7,8,9">
+              Your browser does not support the HTML5 canvas tag. Please upgrade your browser. We reccomend you install <a href="https://www.google.com/chrome/browser/desktop/">Google Chrome</a>
+            </canvas>
+          </div>
 
-    <div id="control-panel">
-      <input type="number" name="bet" value="">
-      <div class="button green">Put</div>
-      <div class="button red">Call</div>
+          <div class="row">
+            <div class="col-md-6">
+              <div id="put" class="button green">Put</div>
+            </div>
+            <div class="col-md-6">
+              <div id="call" class="button red">Call</div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <input type="number" name="bet" value="">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="price"><span id="live-return-rate">80</span> %</div>
+          <div class="orders">
+            <div class="card">
+              <ul>
+                <li>a lits of all orders and if they are green or red</li>
+                <li>in progress or ended</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script src="https://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.js"></script>
     <script type="text/javascript" src="assets/sparkline.js"></script>
 
-    <script type="text/javascript" src="assets/web3.min.js">
-
-    </script>
+    <script type="text/javascript" src="assets/web3.min.js"></script>
     <script type="text/javascript">
     window.addEventListener('load', function() {
       // Checking if Web3 has been injected by the browser (Mist/MetaMask)
@@ -89,6 +116,7 @@
       function connectedNetwork() {
         web3.eth.getBlock(0, function (error, result) {
           if (result.hash === "0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3") {
+            // TODO: Check whether it is ETC or ETH
             network = "mainnet";
           } else if (result.hash === "0x0cd786a2425d16f152c658316c423e6ce1181e15c3295826d7c9904cba9ce303") {
             network = "testnet";
@@ -98,13 +126,27 @@
         });
       }
 
-      var binarytradingContract = web3.eth.contract([{"constant":false,"inputs":[{"name":"amountInEther","type":"uint256"}],"name":"brokerWithdrawl","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"},{"name":"proof","type":"bytes"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[{"name":"withdrawalBalance","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"secondsToExpiration","type":"uint256"}],"name":"externalPutRequest","outputs":[],"payable":true,"type":"function"},{"constant":true,"inputs":[],"name":"ETHUSD","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"returnRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"brokerDeposit","outputs":[{"name":"balance","type":"uint256"}],"payable":true,"type":"function"},{"constant":false,"inputs":[],"name":"deposit","outputs":[],"payable":true,"type":"function"},{"constant":false,"inputs":[{"name":"newReturnRate","type":"uint256"}],"name":"updateReturnRate","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"secondsToExpiration","type":"uint256"}],"name":"externalCallRequest","outputs":[],"payable":true,"type":"function"},{"inputs":[{"name":"_returnRate","type":"uint256"}],"type":"constructor"},{"payable":false,"type":"fallback"}]).at("0x5caD3cBdbf64B65174b36269f5201d3265569F2B");
+      var abi = [{"constant":false,"inputs":[{"name":"amountInEther","type":"uint256"}],"name":"brokerWithdrawl","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"},{"name":"proof","type":"bytes"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[{"name":"withdrawalBalance","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"secondsToExpiration","type":"uint256"}],"name":"externalPutRequest","outputs":[],"payable":true,"type":"function"},{"constant":true,"inputs":[],"name":"ETHUSD","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"returnRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"brokerDeposit","outputs":[{"name":"balance","type":"uint256"}],"payable":true,"type":"function"},{"constant":false,"inputs":[],"name":"deposit","outputs":[],"payable":true,"type":"function"},{"constant":false,"inputs":[{"name":"newReturnRate","type":"uint256"}],"name":"updateReturnRate","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"secondsToExpiration","type":"uint256"}],"name":"externalCallRequest","outputs":[],"payable":true,"type":"function"},{"inputs":[{"name":"_returnRate","type":"uint256"}],"type":"constructor"},{"payable":false,"type":"fallback"}];
+
+      var binarytradingContract = web3.eth.contract(abi).at("0x5caD3cBdbf64B65174b36269f5201d3265569F2B");
 
       var returnRate = binarytradingContract.returnRate.call(function(error, result){
         console.log(result);
       });
 
+      // watch for an event
+      // var myEvent = myContractInstance.MyEvent({some: 'args'}, additionalFilterObject);
+      // myEvent.watch(function(error, result){
+      //    ...
+      // });
+      //
+      // // would get all past logs again.
+      // var myResults = myEvent.get();
+
     });
     </script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   </body>
 </html>

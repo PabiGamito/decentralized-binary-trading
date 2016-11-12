@@ -1,8 +1,46 @@
 body {
   margin: 0;
+  background: #F5F5F7;
+  font-family: 'Raleway', sans-serif;
 }
 nav {
-  background-color: #20CE99;
+  background-color: #21CE99;
+  font-family: 'Raleway', sans-serif;
+  color: white;
+}
+nav ul {
+  list-style-type: none;
+}
+nav .nav-bottom {
+  height: 25vh;
+  margin-bottom: -25vh;
+}
+
+.app-container {
+  margin: 2em;
+}
+.card {
+  width: 100%;
+  min-height: 50vh;
+  height: 100%;
+  background: white;
+  display: inline-block;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16), 0 2px 5px rgba(0, 0, 0, 0.26);
+  border: 1px solid #eee;
+}
+
+.card.chart {
+  min-height: 50vh;
+}
+
+.price {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 300;
+  line-height: 125%;
+  font-size: 22px;
+  color: white;
+  text-align: center;
+  padding: 8px;
 }
 
 #control-panel {
@@ -12,12 +50,11 @@ nav {
 
 .button {
   align-self: center;
-  padding: 20px 100px 18px 100px;
+  padding: 8px 0 8px 0px;
   color: white;
   font-family: arial;
   font-size: 18px;
   letter-spacing: 1px;
-  text-transform: uppercase;
   text-align: center;
   border-radius: 5px;
   transition: all 0.1s ease-in-out;
@@ -25,13 +62,13 @@ nav {
   margin: 10px auto 10px auto;
 }
 .button.green {
-  background: #20CE99;
+  background: #00CE98;
 }
 .button.green:hover {
   background: #0bb581;
 }
 .button.red {
-  background: #ff5555;
+  background: #FB5229;
 }
 .button.red:hover {
   background: #db2c2c;
@@ -54,4 +91,5 @@ input {
   color: #999;
   font-size: 18px;
   font-weight: 700;
+  margin: 10px auto 10px auto;
 }
