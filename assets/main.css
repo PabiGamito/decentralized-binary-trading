@@ -42,6 +42,13 @@ nav .nav-bottom {
   text-align: center;
   padding: 8px;
 }
+.price p {
+  margin: 0;
+  margin-bottom: -10px;
+}
+.price small {
+  font-size: 14px;
+}
 
 #control-panel {
   margin: 0 auto;

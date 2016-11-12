@@ -1,3 +1,5 @@
+// TODO: Mark chart line margin larger, but only spark line margin not general margin
+
 // Defines c as the canvas object
 var c = document.getElementById('sparkline');
 var ctx = c.getContext("2d");
@@ -19,8 +21,7 @@ var currentMousePos = { x: -1, y: -1 };
 $("canvas").mousemove(function(e) {
   currentMousePos.x = e.offsetX;
   currentMousePos.y = e.offsetY;
-  ctx.clearRect(0, 0, c.width, c.height);
-  renderCanvas();
+  refreshCanva();
   renderPointer(e.offsetX, e.offsetY);
 });
 
@@ -119,9 +120,13 @@ function animate(){
   setTimeout(function() {
     requestAnimationFrame(animate);
   }, 500);
+  refreshCanva();
+  frame++;
+}
+
+function refreshCanva() {
   ctx.clearRect(0, 0, c.width, c.height);
   renderCanvas();
-  frame++;
 }
 
 // Function that draws the graph
@@ -300,14 +305,14 @@ function renderTimeLabels() {
 }
 
 function renderOptionExpirationLine(x) {
-  // var grad = ctx.createLinearGradient(0, 0, 0, c.height);
-	// grad.addColorStop(0, "#ffffff");  // Initial path colour
-	// grad.addColorStop(1, "#FB5229");  // End stroke colour
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 0;
-  ctx.shadowBlur    = 7;
-  ctx.shadowColor   = "gray";
-  renderVerticalLine(x, "#FB5229", 2);
+  var grad = ctx.createLinearGradient(0, 0, 0, c.height/3);
+	grad.addColorStop(0, "rgba(255, 255, 255, 0)");  // Initial path colour
+	grad.addColorStop(1, "#FB5229");  // End stroke colour
+  // ctx.shadowOffsetX = 0;
+  // ctx.shadowOffsetY = 0;
+  // ctx.shadowBlur    = 7;
+  // ctx.shadowColor   = "gray";
+  renderVerticalLine(x, grad, 2);
   renderExpirationBubble(x);
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 0;
@@ -323,19 +328,34 @@ function renderExpirationBubble(x) {
   ctx.stroke();
 }
 
+$("#put").hover( function() {
+  // When mouse enters
+  renderPutOverlay();
+}, function() {
+  // When mouse leaves
+  refreshCanva();
+});
 function renderPutOverlay() {
-	var grad = ctx.createLinearGradient(0, 0, 0, c.height);
-	grad.addColorStop(1, "rgba(255, 255, 255, 0)");  // Initial path colour
-	grad.addColorStop(0, "rgba(0, 207, 152, 0.8)");  // End stroke colour
-	// ctx.strokeStyle = grad;
-	ctx.fillStyle = grad;
-  ctx.fillRect(0, livePriceY, c.width, c.height);
-}
-function renderCallOverlay() {
-	var grad = ctx.createLinearGradient(0, 0, 0, c.height);
-	grad.addColorStop(1, "rgba(255, 50, 0, 0.8)");  // Initial path colour
-	grad.addColorStop(0, "rgba(0, 122, 201, 0)");  // End stroke colour
+	var grad = ctx.createLinearGradient(0, livePriceY-c.height, 0, livePriceY);
+	grad.addColorStop(0, "rgba(255, 255, 255, 0)");  // Initial path colour
+	grad.addColorStop(1, "rgba(0, 207, 152, 0.3)");  // End stroke colour
 	// ctx.strokeStyle = grad;
 	ctx.fillStyle = grad;
   ctx.fillRect(0, 0, c.width, livePriceY);
+}
+
+$("#call").hover( function() {
+  // When mouse enters
+  renderCallOverlay();
+}, function() {
+  // When mouse leaves
+  refreshCanva();
+});
+function renderCallOverlay() {
+	var grad = ctx.createLinearGradient(0, livePriceY, 0, livePriceY+c.height);
+	grad.addColorStop(0, "rgba(255, 50, 0, 0.3)");  // Initial path colour
+	grad.addColorStop(1, "rgba(0, 122, 201, 0)");  // End stroke colour
+	// ctx.strokeStyle = grad;
+	ctx.fillStyle = grad;
+  ctx.fillRect(0, livePriceY, c.width, c.height);
 }
