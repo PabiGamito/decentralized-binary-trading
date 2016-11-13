@@ -55,7 +55,7 @@ contract BinaryTrading is usingOraclize {
   // This function is called upon contract creation
   function BinaryTrading(uint _returnRate) {
     minter = msg.sender;
-    returnRate = returnRate;
+    returnRate = _returnRate;
     oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
   }
 
