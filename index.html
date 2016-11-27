@@ -27,34 +27,24 @@
       </nav>
 
       <section id="menu-open-bar" class="col-md-3">
-        <div class="top-menu">
-          Info
+        <div class="search">
+          <input type="text" v-model="searchString" placeholder="Search by pair or market name" />
         </div>
-        <ul v-on:click.prevent>
-          <li class="pair active btc_cny" v-on:click="makeActivePair('btc_cny')">
+        <ul v-for="pair in filteredPairs" v-on:click.prevent>
+          <li class="pair" v-bind:class="pair.id" v-on:click="makeActivePair(pair.id)">
             <ul>
               <li class="name">
-                BTC/CNY
-                <span>Okcoin</span>
+                {{ pair.name }}
+                <span>{{ pair.exchange }}</span>
               </li>
               <li class="mini-graph">
                 show graph here
               </li>
-              <li class="price">
-                {{ (Math.round( pairs.btc_cny.price * 100 ) / 100).toFixed(2) }}
+              <li class="price" v-if="pair.change >= 0">
+                {{ (Math.round( pair.price * 100 ) / 100).toFixed(2) }}
               </li>
-            </ul>
-          </li>
-          <li class="pair eth_btc" v-on:click="makeActivePair('eth_btc')">
-            <ul>
-              <li class="name">
-                ETH/BTC <span>Poloniex</span>
-              </li>
-              <li class="mini-graph">
-                show graph here
-              </li>
-              <li class="price red">
-                {{ (Math.round( pairs.eth_btc.price * 100 ) / 100).toFixed(2) }}
+              <li class="price red" v-else>
+                {{ (Math.round( pair.price * 100 ) / 100).toFixed(2) }}
               </li>
             </ul>
           </li>

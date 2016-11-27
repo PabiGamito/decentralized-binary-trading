@@ -3,23 +3,52 @@ var app = new Vue({
   data: {
     activeNav: 'buy-options',
     activeTimeFrame: '1-day',
-    currentView: 'btc_cny',
     balance: 0,
-    activePair: 'btc_cny',
+    searchString: "",
+    activePair: 'btc_cny_okcoin',
     pairs: {
-      btc_cny: {
+      btc_cny_okcoin: {
+        id: "btc_cny_okcoin",
+        name: "BTC/CNY",
+        exchange: "okcoin",
         price: 5680,
         change: 5
       },
-      eth_btc: {
-        price: 9.8
+      eth_btc_poloniex: {
+        id: "eth_btc_poloniex",
+        name: "ETH/BTC",
+        exchange: "poloniex",
+        price: 9.8,
+        change: -2
       }
     }
   },
-  components: {
-    content: {}
+  computed: {
+    // A computed property that holds only those articles that match the searchString.
+    filteredPairs: function () {
+      var pairs = this.pairs,
+        searchString = this.searchString;
+
+      if(!searchString){
+        return pairs;
+      }
+
+      searchString = searchString.trim().toLowerCase();
+
+      pairs = pairs.filter(function(item) {
+        if(item.title.toLowerCase().indexOf(searchString) !== -1){
+            return item;
+        }
+      });
+
+      // Return an array with the filtered data.
+      return pairs;
+    }
   },
   methods: {
+    initialize: function() {
+      $("#menu-open-bar ul li.pair").first().addClass("active");
+    },
 		makeActiveNav: function(item) {
 			this.activeNav = item;
       $("nav#menu ul li.active").removeClass("active");
@@ -27,6 +56,7 @@ var app = new Vue({
 		},
     makeActivePair: function(pair) {
       this.activePair = pair;
+      console.log(pair);
       $("#menu-open-bar ul li.pair.active").removeClass("active");
       $("#menu-open-bar ul li.pair." + pair).addClass("active");
     },
@@ -37,3 +67,5 @@ var app = new Vue({
     }
 	}
 });
+
+app.initialize();
