@@ -2,52 +2,166 @@ body {
   margin: 0;
   background: #F5F5F7;
   font-family: 'Raleway', sans-serif;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor:default;
 }
-nav {
-  background-color: #21CE99;
+
+nav#menu {
   font-family: 'Raleway', sans-serif;
+  height: 100vh;
+  background: #F2F5F8;
+  border-right: 1px solid #DADEE0;
+  color: #848F9C;
+  padding: 0;
+  position: relative;
+  z-index: 2;
+}
+nav .top-menu {
+  background: #3ECC94;
   color: white;
+  padding: 20px;
 }
 nav ul {
   list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
-nav .nav-bottom {
+nav ul li {
+  margin: 0;
+  padding: 0;
+  margin: 20px 30px 20px 30px;
+  cursor: pointer;
+}
+nav ul li.active {
+  color: black;
+  font-weight: 700;
+}
+/*nav .nav-bottom {
   height: 25vh;
   margin-bottom: -25vh;
-}
+}*/
 
-.app-container {
-  margin: 2em;
+#menu-open-bar {
+  padding: 0;
 }
-.card {
-  width: 100%;
-  min-height: 50vh;
-  height: 100%;
+#menu-open-bar .top-menu {
+  padding: 20px;
+  border-bottom: 1px solid #DADEE0;
+}
+#menu-open-bar {
+  height: 100vh;
+  background: #F2F5F8;
+}
+#menu-open-bar ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 30px;
+  cursor: pointer;
+}
+#menu-open-bar ul li.pair:not(:first-child) {
+  border-top: 1px solid #DADEE0;
+}
+#menu-open-bar ul li.pair.active {
   background: white;
+  position: relative;
+  z-index: 1;
+  box-shadow: -5px 0px 10px 0px #E7EAEC;
+  border-top: 0;
+  margin-left: -30px;
+  padding-left: 30px;
+}
+#menu-open-bar ul li.pair.active + li {
+  border-top: 0;
+}
+#menu-open-bar ul li.pair ul {
+  padding: 20px 15px 20px 0;
+}
+#menu-open-bar ul li.pair ul li {
   display: inline-block;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16), 0 2px 5px rgba(0, 0, 0, 0.26);
-  border: 1px solid #eee;
+  vertical-align: top;
 }
-
-.card.chart {
-  min-height: 50vh;
+#menu-open-bar ul li.pair ul li.name {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 600;
 }
-
-.price {
+#menu-open-bar ul li.pair ul li.name span {
+  font-size: 10px;
+  display: block;
+  text-transform: uppercase;
+  color: #848F9C;
   font-family: 'Raleway', sans-serif;
+  font-weight: 400;
+  margin-top: -3px;
+}
+#menu-open-bar ul li.pair ul li.mini-graph {
+  margin: 0 auto;
+}
+#menu-open-bar ul li.pair ul li.price {
+  float: right;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  border-radius: 5px;
+  color: white;
+  background: #3ECC94;
+  margin-top: 2px;
+  padding: 4px 10px 4px 10px;
+  width: 80px;
+}
+#menu-open-bar ul li.pair ul li.price.red {
+  background: #FB5229;
+}
+
+#content {
+  min-height: 100vh;
+  padding: 30px;
+  box-shadow: -2px 0px 10px 0px #E7EAEC;
+}
+#content .header {
+  border-bottom: 1px solid #DADEE0;
+  padding-bottom: 15px;
+  margin-bottom: 5px;
+}
+#content .header .price {
+  font-family: 'Source Sans Pro', sans-serif;
   font-weight: 300;
   line-height: 125%;
-  font-size: 22px;
-  color: white;
-  text-align: center;
-  padding: 8px;
+  font-size: 42px;
+  color: black;
+  text-align: left;
 }
-.price p {
+#content .header .price p {
   margin: 0;
   margin-bottom: -10px;
 }
-.price small {
+#content .header .price small {
   font-size: 14px;
+}
+#content nav.time-frame-menu {
+  text-align: center;
+  margin: 15px 20px 15px 20px;
+}
+#content .time-frame-menu ul {
+  display: inline-block;
+}
+#content .time-frame-menu ul li {
+  font-family: 'Raleway', sans-serif;
+  display: inline-block;
+  color: #47D19C;
+  margin: 0;
+  padding: 5px 10px 5px 10px;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+#content .time-frame-menu ul li.active {
+  color: black;
+  border-bottom: 2px solid #47D19C;
 }
 
 #control-panel {

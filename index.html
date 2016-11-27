@@ -4,77 +4,97 @@
     <meta charset="utf-8">
     <title></title>
     <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400" rel="stylesheet">
     <link rel="stylesheet" href="assets/main.css" media="screen" title="no title">
     <!-- <link rel="stylesheet" href="assets/chartist.min.css" media="screen" title="no title"> -->
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="assets/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/vue.min.js"></script>
   </head>
   <body>
-    <nav>
-      <div class="nav-top">
+    <div id="app">
+      <nav id="menu" class="col-md-2" v-bind:class="activeNav" v-on:click.prevent>
+        <div class="top-menu">
+          Balance {{ balance }} ETH
+        </div>
         <ul>
-          <li><span id="user-balance"></span> ETH</li>
+          <li class="buy-options active" v-on:click="makeActiveNav('buy-options')">Buy Options</li>
+          <li class="active-orders" v-on:click="makeActiveNav('active-orders')">Active Orders</li>
+          <li class="history" v-on:click="makeActiveNav('history')">History</li>
+          <li class="help" v-on:click="makeActiveNav('help')">How to works?</li>
         </ul>
-      </div>
-      <div class="nav-bottom"></div>
-    </nav>
+      </nav>
 
-    <div class="app-container">
-      <!-- TODO: Make a background like this one: http://faucet.etherparty.io/ -->
-      <div class="row">
-        <div class="col-md-9">
-
-          <div class="price">
-            <p>
-              <span id="live-price"></span> mBTC
-            </p>
-            <small>+5.2%</small>
-          </div>
-
-          <div class="card chart">
-            <canvas id="sparkline" width="100%" height="100%" data-sparkline="1,2,3,4,5,5.5,5.8,6,5.4,4.8,3,2,2,6,7,8,9,10,10,7,6,7,7,8,9">
-              Your browser does not support the HTML5 canvas tag. Please upgrade your browser. We reccomend you install <a href="https://www.google.com/chrome/browser/desktop/">Google Chrome</a>
-            </canvas>
-          </div>
-
-          <div class="row">
-            <div class="col-md-6">
-              <div id="put" class="button green">Put</div>
-            </div>
-            <div class="col-md-6">
-              <div id="call" class="button red">Call</div>
-            </div>
-            <div class="row">
-              <div class="col-md-12">
-                <input type="number" name="bet" value="">
-              </div>
-            </div>
-          </div>
+      <section id="menu-open-bar" class="col-md-3">
+        <div class="top-menu">
+          Info
         </div>
+        <ul v-on:click.prevent>
+          <li class="pair active btc_cny" v-on:click="makeActivePair('btc_cny')">
+            <ul>
+              <li class="name">
+                BTC/CNY
+                <span>Okcoin</span>
+              </li>
+              <li class="mini-graph">
+                show graph here
+              </li>
+              <li class="price">
+                {{ (Math.round( pairs.btc_cny.price * 100 ) / 100).toFixed(2) }}
+              </li>
+            </ul>
+          </li>
+          <li class="pair eth_btc" v-on:click="makeActivePair('eth_btc')">
+            <ul>
+              <li class="name">
+                ETH/BTC <span>Poloniex</span>
+              </li>
+              <li class="mini-graph">
+                show graph here
+              </li>
+              <li class="price red">
+                {{ (Math.round( pairs.eth_btc.price * 100 ) / 100).toFixed(2) }}
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </section>
 
-        <div class="col-md-3">
+      <section id="content" class="col-md-7" v-bind:class="activePair">
+        <section class="header">
           <div class="price">
-            <p>
-              <span id="live-return-rate">80</span>%
-            </p>
-            <small>Return Rate</small>
+            {{ (Math.round( pairs[activePair].price * 100 ) / 100).toFixed(2) }}
           </div>
-          <div class="orders">
-            <div class="card">
-              <ul>
-                <li>a lits of all orders and if they are green or red</li>
-                <li>in progress or ended</li>
-              </ul>
-            </div>
+          <div class="price-change">
+
           </div>
-        </div>
-      </div>
+        </section>
+        <section class="graph">
+          <canvas id="sparkline" width="100%" height="100%" style="z-index: 100;">
+            Your browser does not support the HTML5 canvas tag. Please upgrade your browser. We reccomend you install <a href="https://www.google.com/chrome/browser/desktop/">Google Chrome</a>
+          </canvas>
+          <nav class="time-frame-menu">
+            <ul>
+              <li class="1-day active" v-on:click="makeActiveTimeFrame('1-day')">1 day</li>
+              <li class="1-week" v-on:click="makeActiveTimeFrame('1-week')">1 week</li>
+              <li class="1-month" v-on:click="makeActiveTimeFrame('1-month')">1 month</li>
+              <li class="3-month" v-on:click="makeActiveTimeFrame('3-month')">3 months</li>
+              <li class="6-month" v-on:click="makeActiveTimeFrame('6-month')">6 months</li>
+              <li class="1-year" v-on:click="makeActiveTimeFrame('1-year')">1 year</li>
+            </ul>
+          </nav>
+        </section>
+        <section class="footer">
+
+        </section>
+      </section>
     </div>
 
-    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
-    <script src="https://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.js"></script>
-    <script type="text/javascript" src="assets/sparkline.js"></script>
+    <script type="text/javascript" src="assets/app.js"></script>
+    <script src="assets/socket.io-1.4.5.js"></script>
+    <script src="assets/autobahn.min.js"></script>
+    <script src="assets/sparkline.js"></script>
 
     <script type="text/javascript" src="assets/web3.min.js"></script>
     <script type="text/javascript">
@@ -118,8 +138,8 @@
 
       function updateBalanceCallback(result) {
         var balanceWei = result.toNumber();
-        balance = web3.fromWei(balanceWei, 'ether');
-        $("#user-balance").text(balance);
+        balance = parseFloat(web3.fromWei(balanceWei, 'ether'));
+        app.balance = balance.toFixed(3);
       }
 
       var network = null;

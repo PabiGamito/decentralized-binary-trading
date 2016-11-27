@@ -13,6 +13,7 @@ TODO: Pay some of the extra brokerBalance as interest to users who have money in
 /*TODO: Figure out a way to have varying returnRate based on total succesful bets*/
 /*TODO: Figure out a way for extra money to come in so it isn't a 0 sum game*/
 /*TODO: Figure out how to deal with contract only being executed every 10-15 seconds*/
+/*TODO: Make is so that some how balance can be tethered to USDT for less volatility*/
 
 contract BinaryTrading is usingOraclize {
 
@@ -69,8 +70,9 @@ contract BinaryTrading is usingOraclize {
     _;
   }
 
-  function updateReturnRate(uint newReturnRate) onlyMinter {
+  function updateReturnRate(uint newReturnRate) onlyMinter returns(bool success) {
     returnRate = newReturnRate;
+    return true;
   }
 
   function brokerWithdrawl(uint amountInEther) external onlyMinter {

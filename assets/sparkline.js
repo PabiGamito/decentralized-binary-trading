@@ -1,7 +1,7 @@
 // TODO: Mark chart line margin larger, but only spark line margin not general margin
 
 // Defines c as the canvas object
-var c = document.getElementById('sparkline');
+var c = document.getElementById("sparkline");
 var ctx = c.getContext("2d");
 var margin = 10;
 var priceData = [];
@@ -13,8 +13,8 @@ var firstPricePointDate = null;
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas, false);
 function resizeCanvas() {
-  c.width = $(".chart.card").width();
-  c.height = $(".chart.card").height();
+  c.width = $("section#content").width();
+  c.height = $("section#content").height()/2;
 }
 
 var currentMousePos = { x: -1, y: -1 };
@@ -140,9 +140,9 @@ function renderCanvas() {
   var sparkLineTime = sparkLineEndTime - sparkLineBeginTime;
   var graphTime = secondsTillExpiration + sparkLineTime;
 
-  if ( $("#put").is(":hover") ) {
+  if ( $("#put").is("hover") ) {
     renderPutOverlay();
-  } else if ( $("#call").is(":hover") ) {
+  } else if ( $("#call").is("hover") ) {
     renderCallOverlay();
   }
 
@@ -151,7 +151,7 @@ function renderCanvas() {
   renderSparkLine(sparkLineWidth); // rendersSparkLine and returns SparkLine end Coordinates
   renderOptionExpirationLine(c.width - margin - 50);
 
-  if ( $('canvas').is(":hover") ) {
+  if ( $("canvas").is("hover") ) {
     renderPointer(currentMousePos.x, currentMousePos.y);
   }
 }
