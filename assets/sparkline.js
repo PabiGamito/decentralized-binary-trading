@@ -31,82 +31,6 @@ function updatePriceData(period, dataPoints) {
 
 updatePriceData(300, 100);
 
-// BTC TO USD //
-function updateCNY_BTCPrice(period, dataPoints) {
-  $.ajax({
-    dataType: "json",
-    url: "https://data.btcchina.com/data/trades"
-  }).done(function (data) {
-    var foundDataPoints = 0;
-    var unixPeriod = parseInt(data[data.length - 1].date/period);
-    console.log(unixPeriod);
-    for (i = data.length - 1; i >= 0; i--) {
-      if (parseInt(data[i].date/period) !== unixPeriod) {
-        unixPeriod = parseInt(data[i].date/period);
-        console.log(data[i].price);
-        foundDataPoints += 1;
-      }
-      if (foundDataPoints >= dataPoints) {
-        break;
-      }
-    }
-  });
-}
-updateCNY_BTCPrice(300, 15);
-
-var socket = io ('https://websocket.btcc.com/');
-socket.emit('subscribe', 'marketdata_cnybtc');
-// socket.on('ticker', function (data) { console.log(data.ticker.last); });
-
-// ETH TO BTC //
-function updateBTC_ETHPrice(period, dataPoints) {
-  $.ajax({
-    dataType: "json",
-    url: "https://poloniex.com/public",
-    data: {
-      "command": "returnChartData",
-      "currencyPair": "BTC_ETH",
-      "start": Math.floor(Date.now() / 1000) - period * dataPoints,
-      "end": 9999999999,
-      "period": period
-    }
-  }).done(function (data) {
-    priceData = [];
-    for (i = 0; i < data.length; i++) {
-      priceData.push(data[i].close);
-    }
-    var latestPricePoint = data[data.length - 1];
-    latestPricePointDate = latestPricePoint.date;
-    firstPricePointDate = data[0].date;
-    var updateInSeconds = latestPricePointDate + period - Math.floor(Date.now() / 1000);
-    if (updateInSeconds < 0) updateInSeconds = 5;
-    setTimeout(function() {
-      updatePriceData(period, dataPoints);
-    }, updateInSeconds * 1000);
-    if (!animating) {
-      $("#live-price").text((latestPricePoint.close * 1000).toFixed(3));
-      animate();
-      renderCanvas();
-    }
-  });
-}
-
-var connection = new autobahn.Connection({url: 'wss://api.poloniex.com', realm: 'realm1'});
-connection.onopen = function (session) {
-   // subscribe to a topic
-   session.subscribe('ticker', onevent);
-   // what to do when it received trade update data
-   function onevent(args) {
-     if (args[0] === "BTC_ETH") {
-       // TODO: Take this price and update it in the chart live
-       var lastPrice = args[1];
-       $("#live-price").text((lastPrice * 1000).toFixed(3));
-       priceData[priceData.length - 1] = lastPrice;
-     }
-   }
-};
-connection.open();
-
 // Functions to get the max and min value of an array
 function maxVal(array) {
 	return Math.max.apply(Math, array);
@@ -140,9 +64,9 @@ function renderCanvas() {
   var sparkLineTime = sparkLineEndTime - sparkLineBeginTime;
   var graphTime = secondsTillExpiration + sparkLineTime;
 
-  if ( $("#put").is("hover") ) {
+  if ( $("#put:hover").length ) {
     renderPutOverlay();
-  } else if ( $("#call").is("hover") ) {
+  } else if ( $("#call:hover").length ) {
     renderCallOverlay();
   }
 
@@ -151,7 +75,7 @@ function renderCanvas() {
   renderSparkLine(sparkLineWidth); // rendersSparkLine and returns SparkLine end Coordinates
   renderOptionExpirationLine(c.width - margin - 50);
 
-  if ( $("canvas").is("hover") ) {
+  if ( $("canvas:hover").length ) {
     renderPointer(currentMousePos.x, currentMousePos.y);
   }
 }
@@ -248,7 +172,7 @@ function renderPriceLabels(minPrice, maxPrice) {
   var totalPriceLabels = 5;
   var priceInterval = (maxPrice-minPrice)/totalPriceLabels;
   var price = minPrice;
-  for(i = 0; i<totalPriceLabels; i++) {
+  for(i = 0; i < totalPriceLabels; i++) {
     ctx.font = "12px Arial";
     ctx.fillStyle = "#747474";
     var y = c.height-margin-i*((c.height-(2*margin))/totalPriceLabels);
@@ -293,7 +217,7 @@ var livePriceY = null;
 function renderLivePriceLabel(y, price) {
   livePriceY = y;
   ctx.setLineDash([2, 2]);
-  renderHorizontalLine(y, "#8ea189", 2);
+  renderHorizontalLine(y, "#DDE0E4", 2);
   ctx.setLineDash([]);
   ctx.font = "12px Arial";
   ctx.fillStyle = "#747474";

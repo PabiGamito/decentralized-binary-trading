@@ -30,8 +30,24 @@
         <div class="search">
           <input type="text" v-model="searchString" placeholder="Search by pair or market name" />
         </div>
-        <ul v-for="pair in filteredPairs" v-on:click.prevent>
-          <li class="pair" v-bind:class="pair.id" v-on:click="makeActivePair(pair.id)">
+        <script type="text/javascript">
+          function displayNumber(n) {
+            if ( (Math.round( n * 100 ) / 100).toFixed(2) == n ) {
+              return (Math.round( n * 100 ) / 100).toFixed(2);
+            } else {
+              var nLength = n.toString().replace('.', '').length;
+              if (nLength > 8) {
+                return parseFloat(n.toString().slice(0, 8-nLength));
+              } else {
+                return n;
+              }
+            }
+          }
+
+        </script>
+        <ul v-for="pairSearchData in filteredPairs" v-on:click.prevent>
+          <span class="pair-data" v-show.visible="false">{{ pair = pairs[pairSearchData.id] }}</span>
+          <li class="pair" v-bind:class="pairSearchData.id" v-on:click="makeActivePair(pairSearchData.id)">
             <ul>
               <li class="name">
                 {{ pair.name }}
@@ -41,10 +57,10 @@
                 show graph here
               </li>
               <li class="price" v-if="pair.change >= 0">
-                {{ (Math.round( pair.price * 100 ) / 100).toFixed(2) }}
+                {{ displayNumber( pair.price ) }}
               </li>
               <li class="price red" v-else>
-                {{ (Math.round( pair.price * 100 ) / 100).toFixed(2) }}
+                {{ displayNumber( pair.price ) }}
               </li>
             </ul>
           </li>
@@ -52,13 +68,27 @@
       </section>
 
       <section id="content" class="col-md-7" v-bind:class="activePair">
+        <span class="pair-data" v-show.visible="false">{{ pair = pairs[activePair] }}</span>
         <section class="header">
-          <div class="price">
-            {{ (Math.round( pairs[activePair].price * 100 ) / 100).toFixed(2) }}
-          </div>
-          <div class="price-change">
-
-          </div>
+          <ul class="left">
+            <li class="price">
+              {{ displayNumber( pair.price ) }}
+            </li>
+            <li class="price-change" v-if="pair.change >= 0">
+              +5.23 ({{ pair.change }}%)
+            </li>
+            <li class="price-change red" v-else>
+              -5.23 ({{ pair.change }}%)
+            </li>
+          </ul>
+          <ul class="right">
+            <li class="pair-name">
+              {{ pair.name }}
+            </li>
+            <li class="exchange">
+              {{ pair.exchange }}
+            </li>
+          </ul>
         </section>
         <section class="graph">
           <canvas id="sparkline" width="100%" height="100%" style="z-index: 100;">
@@ -84,6 +114,7 @@
     <script type="text/javascript" src="assets/app.js"></script>
     <script src="assets/socket.io-1.4.5.js"></script>
     <script src="assets/autobahn.min.js"></script>
+    <script type="text/javascript" src="assets/updateData.js"></script>
     <script src="assets/sparkline.js"></script>
 
     <script type="text/javascript" src="assets/web3.min.js"></script>

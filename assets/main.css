@@ -126,6 +126,21 @@ nav ul li.active {
   border-bottom: 1px solid #DADEE0;
   padding-bottom: 15px;
   margin-bottom: 5px;
+  display:flex;
+  justify-content:space-between;
+}
+#content .header ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+}
+#content .header ul.left {
+  text-align: left;
+}
+#content .header ul.right {
+  text-align: right;
+  align-self: flex-end;
 }
 #content .header .price {
   font-family: 'Source Sans Pro', sans-serif;
@@ -135,12 +150,25 @@ nav ul li.active {
   color: black;
   text-align: left;
 }
-#content .header .price p {
+#content .header .price {
   margin: 0;
-  margin-bottom: -10px;
 }
-#content .header .price small {
-  font-size: 14px;
+#content .header .price-change {
+  font-size: 12px;
+  font-family: 'Raleway', sans-serif;
+  color: #FB5229;
+}
+#content .header .price-change.red {
+  color: #3ECC94;
+}
+#content .header .pair-name {
+
+}
+#content .header .exchange {
+  font-size: 12px;
+  color: #ABB4BE;
+  text-transform: capitalize;
+  font-family: 'Raleway', sans-serif;
 }
 #content nav.time-frame-menu {
   text-align: center;
