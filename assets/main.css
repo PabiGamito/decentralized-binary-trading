@@ -156,10 +156,10 @@ nav ul li.active {
 #content .header .price-change {
   font-size: 12px;
   font-family: 'Raleway', sans-serif;
-  color: #FB5229;
+  color: #3ECC94;
 }
 #content .header .price-change.red {
-  color: #3ECC94;
+  color: #FB5229;
 }
 #content .header .pair-name {
 

@@ -50,7 +50,7 @@
           <li class="pair" v-bind:class="pairSearchData.id" v-on:click="makeActivePair(pairSearchData.id)">
             <ul>
               <li class="name">
-                {{ pair.name }}
+                {{ pair.fsym }}/{{ pair.tsym }}
                 <span>{{ pair.exchange }}</span>
               </li>
               <li class="mini-graph">
@@ -75,15 +75,15 @@
               {{ displayNumber( pair.price ) }}
             </li>
             <li class="price-change" v-if="pair.change >= 0">
-              +5.23 ({{ pair.change }}%)
+              +{{ displayNumber(pair.change) }} ({{ (pair.changePercent).toFixed(2) }}%)
             </li>
             <li class="price-change red" v-else>
-              -5.23 ({{ pair.change }}%)
+              {{ displayNumber(pair.change) }} ({{ (pair.changePercent).toFixed(2) }}%)
             </li>
           </ul>
           <ul class="right">
             <li class="pair-name">
-              {{ pair.name }}
+              {{ pair.fsym }}/{{ pair.tsym }}
             </li>
             <li class="exchange">
               {{ pair.exchange }}
@@ -96,17 +96,18 @@
           </canvas>
           <nav class="time-frame-menu">
             <ul>
-              <li class="1-day active" v-on:click="makeActiveTimeFrame('1-day')">1 day</li>
-              <li class="1-week" v-on:click="makeActiveTimeFrame('1-week')">1 week</li>
-              <li class="1-month" v-on:click="makeActiveTimeFrame('1-month')">1 month</li>
-              <li class="3-month" v-on:click="makeActiveTimeFrame('3-month')">3 months</li>
-              <li class="6-month" v-on:click="makeActiveTimeFrame('6-month')">6 months</li>
-              <li class="1-year" v-on:click="makeActiveTimeFrame('1-year')">1 year</li>
+              <li class="day active" v-on:click="makeActiveTimeFrame('day')">1 day</li>
+              <li class="week" v-on:click="makeActiveTimeFrame('week')">1 week</li>
+              <li class="month" v-on:click="makeActiveTimeFrame('month')">1 month</li>
+              <li class="month3" v-on:click="makeActiveTimeFrame('month3')">3 months</li>
+              <li class="month6" v-on:click="makeActiveTimeFrame('month6')">6 months</li>
+              <li class="year" v-on:click="makeActiveTimeFrame('year')">1 year</li>
             </ul>
           </nav>
         </section>
         <section class="footer">
-
+          <div class="button green put">Put</div>
+          <div class="button red call">Call</div>
         </section>
       </section>
     </div>
@@ -181,7 +182,7 @@
 
       var binarytradingContract = web3.eth.contract(abi).at("0x5caD3cBdbf64B65174b36269f5201d3265569F2B");
 
-      var returnRate = binarytradingContract.returnRate.call(function(error, result){
+      var returnRate = binarytradingContract.returnRate.call(function(error, result) {
         console.log(result);
       });
 

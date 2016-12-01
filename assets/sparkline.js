@@ -25,12 +25,6 @@ $("canvas").mousemove(function(e) {
   renderPointer(e.offsetX, e.offsetY);
 });
 
-function updatePriceData(period, dataPoints) {
-  updateBTC_ETHPrice(period, dataPoints);
-}
-
-updatePriceData(300, 100);
-
 // Functions to get the max and min value of an array
 function maxVal(array) {
 	return Math.max.apply(Math, array);
