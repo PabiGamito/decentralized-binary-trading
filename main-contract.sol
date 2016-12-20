@@ -24,6 +24,9 @@ contract BinaryTrading is usingOraclize {
   // Used to store the contract creator's address
   address minter;
 
+  // Used to store the address of the server
+  address server;
+
   // Mapping is used to make sure that requests are not processed twice
   mapping(bytes32 => bool) myidList;
 
@@ -31,7 +34,8 @@ contract BinaryTrading is usingOraclize {
   uint public ETHUSD;
 
   // Maps so that user balances are easily accessible by address
-  mapping (address => uint) userBalance;
+  mapping (address => uint) userAvailableBalance;
+  mapping (address => uint) userLockedBalance;
   uint brokerBalance;
   uint public returnRate;
 
@@ -70,20 +74,36 @@ contract BinaryTrading is usingOraclize {
     _;
   }
 
+  modifier onlyServer {
+    if (msg.sender != server) throw;
+    _;
+  }
+
+  function updateServerAddress(address serverAddress) onlyMinter return(bool success) {
+    server = serverAddress;
+    return true;
+  }
+
+  // This function allows the minter to update the fixed return rate
+  // TODO: remove fixed return rate and replace by dynamic return rate based on bets so far
   function updateReturnRate(uint newReturnRate) onlyMinter returns(bool success) {
     returnRate = newReturnRate;
     return true;
   }
 
+  // This function allows the broker/minter to withdraw funds to pays of servers and anything else,
+  // but can only withdraw funds from fees and never user funds
   function brokerWithdrawl(uint amountInEther) external onlyMinter {
     if (amountInEther * 1 ether > brokerBalance) throw;
     if (!minter.send(amountInEther * 1 ether)) throw;
   }
 
   // This function allows the user to withdraw his funds
-  function withdraw() external returns (uint withdrawalBalance) {
-    withdrawalBalance = userBalance[msg.sender];
-    if (!msg.sender.send(withdrawalBalance)) throw;
+  function withdraw(uint amountInEther) external returns(bool success) {
+    if (amountInEther * 1 ether > userAvailableBalance[msg.sender]) throw;
+    if (!msg.sender.send(amountInEther * 1 ether)) throw;
+    userAvailableBalance[msg.sender] -= amountInEther * 1 ether;
+    return true;
   }
 
   function brokerDeposit() payable external returns (uint balance) {
@@ -93,9 +113,9 @@ contract BinaryTrading is usingOraclize {
   }
 
   // User deposit
-  function deposit() payable external {
-    userBalance[msg.sender] += msg.value;
-
+  function deposit() payable external returns(bool success) {
+    userAvailableBalance[msg.sender] += msg.value;
+    return true;
   }
 
   // *********************** //
@@ -109,6 +129,7 @@ contract BinaryTrading is usingOraclize {
     placeCallOption(msg.sender, msg.value, secondsToExpiration);
   }
 
+  // README: This should ONLY be called by the externalCallRequest
   function placeCallOption(address userAddress, uint betValue, uint delay) private {
     // Max delay is 30 minutes
     if (delay > 30*60) throw;

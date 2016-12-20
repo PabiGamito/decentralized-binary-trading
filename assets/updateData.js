@@ -1,14 +1,5 @@
 // GET HISTORICAL DATA FROM cryptocompare
-limit = 24;
-dataSet = "histohour";
-timeFrame = "day";
-app.getHistoricalData("btc_cny_btcc", "BTCCHINA", "BTC", "CNY", limit, dataSet, timeFrame);
-app.getHistoricalData("btc_cny_okcoin", "OKCOIN", "BTC", "CNY", limit, dataSet, timeFrame);
-app.getHistoricalData("btc_cny_huobi", "HUOBI", "BTC", "CNY", limit, dataSet, timeFrame);
-app.getHistoricalData("btc_usd_bitfinex", "BITFINEX", "BTC", "USD", limit, dataSet, timeFrame);
-app.getHistoricalData("btc_eur_kraken", "KRAKEN", "BTC", "EUR", limit, dataSet, timeFrame);
-app.getHistoricalData("eth_btc_poloniex", "POLONIEX", "ETH", "BTC", limit, dataSet, timeFrame);
-
+// TODO: Replace all this by a signal query check the api info for how to do it. Allows for gettings all data at once to avoid ddossing the server with requests
 function updatePrice(pair_id, price) {
   app.pairs[pair_id].price = price;
 }
@@ -16,7 +7,7 @@ function updatePrice(pair_id, price) {
 // BTCCHINA //
 var socket = io ('https://websocket.btcc.com/');
 socket.emit('subscribe', 'marketdata_cnybtc');
-socket.on('ticker', function (data) { updatePrice("btc_cny_btcc", parseFloat(data.ticker.last)); });
+socket.on('ticker', function (data) { updatePrice("btc_cny_btcchina", parseFloat(data.ticker.last)); });
 
 // OKCOIN //
 // TODO: Figure out how to get it to work without API key

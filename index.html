@@ -45,26 +45,28 @@
           }
 
         </script>
-        <ul v-for="pairSearchData in filteredPairs" v-on:click.prevent>
-          <span class="pair-data" v-show.visible="false">{{ pair = pairs[pairSearchData.id] }}</span>
-          <li class="pair" v-bind:class="pairSearchData.id" v-on:click="makeActivePair(pairSearchData.id)">
-            <ul>
-              <li class="name">
-                {{ pair.fsym }}/{{ pair.tsym }}
-                <span>{{ pair.exchange }}</span>
-              </li>
-              <li class="mini-graph">
-                show graph here
-              </li>
-              <li class="price" v-if="pair.change >= 0">
-                {{ displayNumber( pair.price ) }}
-              </li>
-              <li class="price red" v-else>
-                {{ displayNumber( pair.price ) }}
-              </li>
-            </ul>
-          </li>
-        </ul>
+        <div class="pair-container">
+          <ul v-for="pairSearchData in filteredPairs" v-on:click.prevent>
+            <span class="pair-data" v-show.visible="false">{{ pair = pairs[pairSearchData.id] }}</span>
+            <li class="pair" v-bind:class="pairSearchData.id" v-on:click="makeActivePair(pairSearchData.id)">
+              <ul>
+                <li class="name">
+                  {{ pair.fsym.toUpperCase() }}/{{ pair.tsym.toUpperCase() }}
+                  <span>{{ pair.exchange }}</span>
+                </li>
+                <li class="mini-graph">
+                  show graph here
+                </li>
+                <li class="price" v-if="pair.change >= 0">
+                  {{ displayNumber( pair.price ) }}
+                </li>
+                <li class="price red" v-else>
+                  {{ displayNumber( pair.price ) }}
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
       </section>
 
       <section id="content" class="col-md-7" v-bind:class="activePair">
@@ -83,7 +85,7 @@
           </ul>
           <ul class="right">
             <li class="pair-name">
-              {{ pair.fsym }}/{{ pair.tsym }}
+              {{ pair.fsym.toUpperCase() }}/{{ pair.tsym.toUpperCase() }}
             </li>
             <li class="exchange">
               {{ pair.exchange }}
@@ -106,8 +108,12 @@
           </nav>
         </section>
         <section class="footer">
-          <div class="button green put">Put</div>
-          <div class="button red call">Call</div>
+          <div class="col-xs-6">
+            <div class="button green put">Put</div>
+          </div>
+          <div class="col-xs-6">
+            <div class="button red call">Call</div>
+          </div>
         </section>
       </section>
     </div>
@@ -119,84 +125,7 @@
     <script src="assets/sparkline.js"></script>
 
     <script type="text/javascript" src="assets/web3.min.js"></script>
-    <script type="text/javascript">
-    window.addEventListener('load', function() {
-      // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-      if (typeof web3 !== 'undefined') {
-        // Use Mist/MetaMask's provider
-        web3 = new Web3(web3.currentProvider);
-      } else {
-        alert('No web3? You should consider trying MetaMask!');
-        // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-      }
-      if(!web3.isConnected()) {
-       alert("Couldn't connect to a node...");
-      }
-
-      var account = web3.eth.accounts[0];
-      // console.log(web3.version.ethereum);
-      // console.log(web3.version.network);
-
-      // Listens for Selected Account Changes
-      var accountInterval = setInterval(function() {
-        if (web3.eth.accounts[0] !== account) {
-          account = web3.eth.accounts[0];
-          updateInterface();
-        }
-      }, 100);
-
-      var balance = null;
-      function updateBalance() {
-        web3.eth.getBalance( account, function(error, result) {
-          if (!error) {
-            updateBalanceCallback(result);
-          } else {
-            updateBalance();
-          }
-        });
-      }
-      updateBalance();
-
-      function updateBalanceCallback(result) {
-        var balanceWei = result.toNumber();
-        balance = parseFloat(web3.fromWei(balanceWei, 'ether'));
-        app.balance = balance.toFixed(3);
-      }
-
-      var network = null;
-      function connectedNetwork() {
-        web3.eth.getBlock(0, function (error, result) {
-          if (result.hash === "0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3") {
-            // TODO: Check whether it is ETC or ETH
-            network = "mainnet";
-          } else if (result.hash === "0x0cd786a2425d16f152c658316c423e6ce1181e15c3295826d7c9904cba9ce303") {
-            network = "testnet";
-          } else {
-            network = "private";
-          }
-        });
-      }
-
-      var abi = [{"constant":false,"inputs":[{"name":"amountInEther","type":"uint256"}],"name":"brokerWithdrawl","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"},{"name":"proof","type":"bytes"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[{"name":"withdrawalBalance","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"secondsToExpiration","type":"uint256"}],"name":"externalPutRequest","outputs":[],"payable":true,"type":"function"},{"constant":true,"inputs":[],"name":"ETHUSD","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"returnRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"brokerDeposit","outputs":[{"name":"balance","type":"uint256"}],"payable":true,"type":"function"},{"constant":false,"inputs":[],"name":"deposit","outputs":[],"payable":true,"type":"function"},{"constant":false,"inputs":[{"name":"newReturnRate","type":"uint256"}],"name":"updateReturnRate","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"secondsToExpiration","type":"uint256"}],"name":"externalCallRequest","outputs":[],"payable":true,"type":"function"},{"inputs":[{"name":"_returnRate","type":"uint256"}],"type":"constructor"},{"payable":false,"type":"fallback"}];
-
-      var binarytradingContract = web3.eth.contract(abi).at("0x5caD3cBdbf64B65174b36269f5201d3265569F2B");
-
-      var returnRate = binarytradingContract.returnRate.call(function(error, result) {
-        console.log(result);
-      });
-
-      // watch for an event
-      // var myEvent = myContractInstance.MyEvent({some: 'args'}, additionalFilterObject);
-      // myEvent.watch(function(error, result){
-      //    ...
-      // });
-      //
-      // // would get all past logs again.
-      // var myResults = myEvent.get();
-
-    });
-    </script>
+    <script type="text/javascript" src="assets/ethereum-interaction.js"></script>
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>

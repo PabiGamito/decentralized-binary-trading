@@ -46,14 +46,23 @@ nav ul li.active {
 
 #menu-open-bar {
   padding: 0;
+  height: 100vh;
+  max-height: 100vh;
+  background: #F2F5F8;
+  display: flex; flex-direction: column;
 }
 #menu-open-bar .search {
   padding: 20px;
   border-bottom: 1px solid #DADEE0;
 }
-#menu-open-bar {
-  height: 100vh;
-  background: #F2F5F8;
+#menu-open-bar .pair-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  -ms-overflow-style: none;  // IE 10+
+  overflow: -moz-scrollbars-none;  // Firefox
+}
+#menu-open-bar .pair-container::-webkit-scrollbar {
+    display: none;  // Safari and Chrome
 }
 #menu-open-bar ul {
   list-style: none;
@@ -197,7 +206,9 @@ nav ul li.active {
   max-width: 350px;
 }
 
-.button {
+#content section.footer .button {
+  font-family: 'Raleway', sans-serif!important;
+  text-transform: uppercase;
   align-self: center;
   padding: 8px 0 8px 0px;
   color: white;

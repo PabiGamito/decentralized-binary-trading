@@ -124,7 +124,7 @@ function renderSparkLine(width) {
 	ctx.lineWidth = lineWidth;
 
   // Renders live price label
-  renderLivePriceLabel(y, parseFloat(priceData[priceData.length - 1])*1000);
+  renderLivePriceLabel(y, parseFloat(priceData[priceData.length - 1]));
 
   // Renders blinking dot
   if (frame % 2 === 0) {
@@ -197,7 +197,7 @@ function renderVerticalLine(x, color, width) {
 function renderPointer(x, y) {
   renderHorizontalLine(y, "#E9E9E9", 1);
   renderVerticalLine(x, "#E9E9E9", 1);
-  renderPointerPrice(y, minVal(priceData)*1000, maxVal(priceData)*1000);
+  renderPointerPrice(y, minVal(priceData), maxVal(priceData));
 }
 
 function renderPointerPrice(y, minPrice, maxPrice) {

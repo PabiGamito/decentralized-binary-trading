@@ -3,9 +3,23 @@ var historicalDataHash = {
   day: [],
   week: [],
   month: [],
+  month3: [],
+  month6: [],
   year: []
 };
 
+function pairHash(fsym, tsym, exchange) {
+  return jQuery.extend(true, {}, {
+    id: fsym + "_" + tsym + "_" + exchange,
+    fsym: fsym,
+    tsym: tsym,
+    exchange: exchange,
+    price: 0,
+    change: 0,
+    changePercent: 0,
+    historicalData: closeHash(historicalDataHash)
+  });
+}
 function closeHash(hash) {
   return jQuery.extend(true, {}, hash);
 }
@@ -17,108 +31,53 @@ var app = new Vue({
     activeTimeFrame: 'day',
     balance: 0,
     searchString: "",
-    activePair: "btc_cny_btcc",
+    activePair: "btc_cny_btcchina",
     pairs: {
-      btc_cny_btcc: {
-        id: "btc_cny_btcc",
-        fsym: "BTC",
-        tsym: "CNY",
-        exchange: "btcchina",
-        price: 0,
-        change: 0,
-        changePercent: 0,
-        historicalData: closeHash(historicalDataHash)
-      },
-      btc_cny_okcoin: {
-        id: "btc_cny_okcoin",
-        fsym: "BTC",
-        tsym: "CNY",
-        exchange: "okcoin",
-        price: 0,
-        change: 0,
-        changePercent: 0,
-        historicalData: closeHash(historicalDataHash)
-      },
-      btc_cny_huobi: {
-        id: "btc_cny_huobi",
-        fsym: "BTC",
-        tsym: "CNY",
-        exchange: "huobi",
-        price: 0,
-        change: 0,
-        changePercent: 0,
-        historicalData: closeHash(historicalDataHash)
-      },
-      btc_usd_bitfinex: {
-        id: "btc_usd_bitfinex",
-        fsym: "BTC",
-        tsym: "USD",
-        exchange: "bitfinex",
-        price: 0,
-        change: 0,
-        changePercent: 0,
-        historicalData: closeHash(historicalDataHash)
-      },
-      btc_eur_kraken: {
-        id: "btc_eur_kraken",
-        fsym: "BTC",
-        tsym: "EUR",
-        exchange: "kraken",
-        price: 0,
-        change: 0,
-        changePercent: 0,
-        historicalData: closeHash(historicalDataHash)
-      },
-      eth_btc_poloniex: {
-        id: "eth_btc_poloniex",
-        fsym: "ETH",
-        tsym: "BTC",
-        exchange: "poloniex",
-        price: 0,
-        change: 0,
-        changePercent: 0,
-        historicalData: closeHash(historicalDataHash)
-      }
+      // NOTE: Pair naming must respect this naming convention to work: fsym_tsym_exchange
+      btc_cny_btcchina: pairHash("btc", "cny", "btcchina"),
+      btc_cny_okcoin: pairHash("btc", "cny", "okcoin"),
+      btc_cny_huobi: pairHash("btc", "cny", "huobi"),
+      // btc_usd_bitmex: pairHash("btc", "usd", "bitmex"),
+      btc_usd_bitfinex: pairHash("btc", "usd", "bitfinex"),
+      btc_eur_kraken: pairHash("btc", "eur", "kraken"),
+      eth_btc_poloniex: pairHash("eth", "btc", "poloniex"),
+      eth_btc_kraken: pairHash("eth", "btc", "kraken"),
+      ltc_usd_okcoin: pairHash("ltc", "usd", "okcoin"),
+      xrp_btc_poloniex: pairHash("xrp", "btc", "poloniex"),
+      xmr_btc_poloniex: pairHash("xmr", "btc", "poloniex")
     },
     pairsSearchData: [
-      {
-        id: "btc_cny_btcc",
-        key_words: "btc, cny, btcchina, bitcoin, chinese yuan"
-      },{
-        id: "btc_cny_okcoin",
-        key_words: "btc, cny, okcoin, bitcoin, chinese yuan"
-      },{
-        id: "btc_cny_huobi",
-        key_words: "btc, cny, huobi, bitcoin, chinese yuan"
-      },{
-        id: "btc_usd_bitfinex",
-        key_words: "btc, usd, bitfinex, bitcoin, us dollar"
-      },{
-        id: "btc_eur_kraken",
-        key_words: "btc, eur, kraken, bitcoin, euro"
-      },{
-        id: "eth_btc_poloniex",
-        key_words: "eth, btc, poloniex, ether, bitcoin"
-      }
+      // To be used and filled by filterPairs function
     ]
   },
   computed: {
     // A computed property that holds only those articles that match the searchString.
     filteredPairs: function () {
-      var pairs = this.pairsSearchData,
+      var pairsSearchData = this.pairsSearchData,
         searchString = this.searchString;
 
+      if(!pairsSearchData.length) {
+        var keys = Object.keys(this.pairs);
+        for(var i in keys) {
+            var pair = this.pairs[keys[i]];
+            pairsSearchData.push({
+              id: pair.id,
+              keyWords: [pair.fsym, pair.tsym, pair.exchange]
+            });
+        }
+      }
+
       if(!searchString){
-        return pairs;
+        return pairsSearchData;
       }
 
       searchString = searchString.trim().toLowerCase();
       var searchArray = searchString.split(" ");
 
-      pairs = pairs.filter( function(pair) {
+      pairsSearchData = pairsSearchData.filter( function(pair) {
         var match = true;
         for (i = 0; i < searchArray.length; i++) {
-          if (pair.key_words.toLowerCase().indexOf(searchArray[i]) === -1) {
+          if (pair.keyWords.join().toLowerCase().indexOf(searchArray[i]) === -1) {
               match = false;
           }
         }
@@ -128,7 +87,7 @@ var app = new Vue({
       });
 
       // Return an array with the filtered data.
-      return pairs;
+      return pairsSearchData;
     }
   },
   methods: {
@@ -137,6 +96,15 @@ var app = new Vue({
         this.makeActivePair(this.pairs[0].id);
       }
       $("#menu-open-bar ul li.pair").first().addClass("active");
+
+      var limit = 24;
+        dataSet = "histohour";
+        timeFrame = "day";
+      var keys = Object.keys(this.pairs);
+      for(var i in keys) {
+          var pair = this.pairs[keys[i]];
+          this.getHistoricalData(pair.id, pair.exchange, pair.fsym, pair.tsym, limit, dataSet, timeFrame);
+      }
     },
 		makeActiveNav: function(item) {
 			this.activeNav = item;
@@ -176,6 +144,14 @@ var app = new Vue({
           case "month3":
             dataSet = "histoday";
             limit = 30*3;
+            break;
+          case "month6":
+            dataSet = "histoday";
+            limit = 30*6;
+            break;
+          case "year":
+            dataSet = "histoday";
+            limit = 365;
             break;
         }
         this.getHistoricalData(pairId, pair.exchange, pair.fsym, pair.tsym, limit, dataSet, this.activeTimeFrame);
